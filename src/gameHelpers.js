@@ -5,3 +5,23 @@ export const createStage = () =>
   Array.from(Array(STAGE_HEIGHT), () =>
     new Array(STAGE_WIDTH).fill([0, 'clear'])
   )
+
+export const checkCollision = (player, stage, { x: moveX, y:moveY }) => {
+  for (let y = 0; y < player.tetrimino.length; y += 1) {
+    for (let x = 0; x < player.tetrimino[y].length; x+=1) {
+
+      // 1. Check that we're on an actual Tetrimino cell
+      if (player.tetrimino[y][x] !== 0) {
+        // 2. Check that tetrimino is still inside the game area
+        // 3. Check that cell we're moving to isn't set to clear
+
+        if (!stage[y + player.pos.y + moveY] || 
+            !stage[y + player.pos.y + moveY][x + player.pos.x + moveX] ||  
+            stage[y + player.pos.y + moveY][x + player.pos.x + moveX][1] !== 'clear') {
+              return true; //collision detected 
+        
+        }
+      }
+    }
+  }
+}
