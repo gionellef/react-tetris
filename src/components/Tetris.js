@@ -79,6 +79,18 @@ const Tetris = () => {
 		setDropTime(null);
 		drop();
 	}
+	
+	const hardDropPlayer = () => {
+		console.log("hard drop");
+		
+		let pot = 0;
+		while (!checkCollision(player, stage, { x: 0, y: pot })) {
+			setDropTime(5);
+			pot += 1;
+		}
+
+		updatePlayerPos({ x: 0, y: pot-1, collided: true });
+	}
 
 	const move = ({ keyCode }) => {
 		if (!gameOver) {
@@ -90,6 +102,9 @@ const Tetris = () => {
 				dropPlayer();
 			} else if (keyCode === 38) { 
 				playerRotate(stage, 1);
+			} else if (keyCode === 32) {
+				hardDropPlayer();
+				setDropTime(1000 / (level + 1) + 200)
 			}
 		}
 	}
