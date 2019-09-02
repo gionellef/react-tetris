@@ -21,10 +21,8 @@ const Tetris = () => {
 	const [gameOver, setGameOver] = useState(false);
 
 	const [player, updatePlayerPos, resetPlayer, playerRotate] = usePlayer();
-	const [stage, setStage, rowsCleared] = useStage(player, resetPlayer);
+	const [stage, setStage, rowsCleared] = useStage(player, resetPlayer, gameOver);
 	const [score, setScore, rows, setRows, level, setLevel] = useGameStatus(rowsCleared);
-
-	console.log('re-render');
 
 	const movePlayer = dir => {
 		if (!checkCollision(player, stage, { x: dir, y: 0 })) {
@@ -56,8 +54,8 @@ const Tetris = () => {
 			updatePlayerPos({ x: 0, y: 1, collided: false })
 		} else {
 			//Game Over
-			if (player.pos.y < 1) {
-				console.log("GAME OVER!!!");
+			if (player.pos.y - player.tetromino.length < 1) {
+				// console.log("GAME OVER!!!");
 				setGameOver(true);
 				setDropTime(null);
 			}
@@ -68,24 +66,24 @@ const Tetris = () => {
 	const keyUp = ({ keyCode }) => {
 		if (!gameOver) {
 			if (keyCode === 40) {
-				console.log("interval on");
+				// console.log("interval on");
 				setDropTime(1000 / (level + 1) + 200);
 			}
 		}
 	}
 
 	const dropPlayer = () => {
-		console.log("interval off");
+		// console.log("interval off");
 		setDropTime(null);
 		drop();
 	}
 	
 	const hardDropPlayer = () => {
-		console.log("hard drop");
+		// console.log("hard drop");
+		
 		
 		let pot = 0;
 		while (!checkCollision(player, stage, { x: 0, y: pot })) {
-			setDropTime(5);
 			pot += 1;
 		}
 
