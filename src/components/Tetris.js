@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { createStage, checkCollision } from '../gameHelpers';
 
@@ -19,6 +19,7 @@ import StartButton from './StartButton';
 const Tetris = () => {
 	const [dropTime, setDropTime] = useState(null);
 	const [gameOver, setGameOver] = useState(false);
+	const [hard, setHard] = useState(false);
 
 	const [player, updatePlayerPos, resetPlayer, playerRotate] = usePlayer();
 	const [stage, setStage, rowsCleared] = useStage(player, resetPlayer, gameOver);
@@ -50,19 +51,25 @@ const Tetris = () => {
 			setDropTime(1000/(level + 1) + 200);
 		}
 
-		if (!checkCollision(player, stage, { x: 0, y: 1 })) {
+		if (!hard && !checkCollision(player, stage, { x: 0, y: 1 })) {
 			updatePlayerPos({ x: 0, y: 1, collided: false })
 		} else {
 			//Game Over
-			if (player.pos.y - player.tetromino.length < 1) {
-				// console.log("GAME OVER!!!");
+			if (player.pos.y < 2) {
+				console.log("GAME OVER!!!");
 				setGameOver(true);
 				setDropTime(null);
 			}
 			updatePlayerPos({ x: 0, y: 0, collided: true });
 		}
 	}
-
+	
+	const dropPlayer = () => {
+		// console.log("interval off");
+		setDropTime(null);
+		drop();
+	}
+	
 	const keyUp = ({ keyCode }) => {
 		if (!gameOver) {
 			if (keyCode === 40) {
@@ -71,25 +78,19 @@ const Tetris = () => {
 			}
 		}
 	}
-
-	const dropPlayer = () => {
-		// console.log("interval off");
-		setDropTime(null);
-		drop();
-	}
 	
-	const hardDropPlayer = () => {
-		// console.log("hard drop");
+	const hardDropPlayer = () => {		
+		setHard(true);
+		let pot = 1;
 		
-		
-		let pot = 0;
 		while (!checkCollision(player, stage, { x: 0, y: pot })) {
 			pot += 1;
 		}
-
-		updatePlayerPos({ x: 0, y: pot-1, collided: true });
+		
+		updatePlayerPos({ x: 0, y: pot-1, collided: false });
+		setHard(false);
 	}
-
+	
 	const move = ({ keyCode }) => {
 		if (!gameOver) {
 			if (keyCode === 37) { // left
@@ -102,10 +103,15 @@ const Tetris = () => {
 				playerRotate(stage, 1);
 			} else if (keyCode === 32) {
 				hardDropPlayer();
-				setDropTime(1000 / (level + 1) + 200)
 			}
 		}
 	}
+	
+	useEffect(() => {
+		if (hard === false) {
+			dropPlayer();
+		}
+	}, [hard]); // <== will run when hard value is changed.
 
 	useInterval(() => {
 		drop();
